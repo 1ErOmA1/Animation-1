@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Rotating Wireframe Cube</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            /* Prevent scrolling */
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Set up the scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Create a wireframe cube
+        const geometry = new THREE.BoxGeometry();
+        const edges = new THREE.EdgesGeometry(geometry); // Create wireframe edges
+        const material = new THREE.LineBasicMaterial({ color: 0xffffff });
+        const cubeWireframe = new THREE.LineSegments(edges, material);
+        scene.add(cubeWireframe);
+
+        // Set initial camera position
+        camera.position.z = 5;
+
+        let isMousePressed = false;
+        let prevMouseX = 0;
+        let prevMouseY = 0;
+
+        // Mouse down event
+        document.addEventListener('mousedown', event => {
+            if (event.button === 0) { // Left mouse button
+                isMousePressed = true;
+                prevMouseX = event.clientX;
+                prevMouseY = event.clientY;
+            }
+        });
+
+        // Mouse up event
+        document.addEventListener('mouseup', event => {
+            if (event.button === 0) { // Left mouse button
+                isMousePressed = false;
+            }
+        });
+
+        // Mouse move event
+        document.addEventListener('mousemove', event => {
+            if (isMousePressed) {
+                const deltaX = event.clientX - prevMouseX;
+                const deltaY = event.clientY - prevMouseY;
+
+                cubeWireframe.rotation.y += deltaX * 0.01;
+                cubeWireframe.rotation.x += deltaY * 0.01;
+
+                prevMouseX = event.clientX;
+                prevMouseY = event.clientY;
+            }
+        });
+
+        // Animation loop
+        const animate = () => {
+            requestAnimationFrame(animate);
+
+            if (!isMousePressed) {
+                // Rotate the cube automatically
+                cubeWireframe.rotation.x += 0.01;
+                cubeWireframe.rotation.y += 0.01;
+            }
+
+            renderer.render(scene, camera);
+        };
+
+        animate();
+    </script>
+</body>
+
+</html>
